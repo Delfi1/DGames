@@ -56,7 +56,7 @@ class Vec2():
         return Vec2(self.x * value, self.y * value)
 
 
-def empty_draw(canvas: tk.Canvas, pos: Pos2):
+def empty_draw(canvas: tk.Canvas, obj):
     pass
 
 
@@ -70,7 +70,7 @@ class GameObject():
 
     # Рисование объекта
     def draw(self, canvas: tk.Canvas):
-        self.draw_func(canvas, self.pos)
+        self.draw_func(canvas, self)
 
     # Клонировать объект
     def clone(self):

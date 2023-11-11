@@ -20,16 +20,15 @@ game = Game()
 Cnv.pack(fill=tk.BOTH, expand=True)
 
 
-def player_draw_func(canvas: tk.Canvas, pos: Pos2):
+def cube_draw_func(canvas: tk.Canvas, obj):
     size = 50
+    canvas.create_oval(0 + obj.pos.x, 0 + obj.pos.y, size - 1 + obj.pos.x, size - 1 + obj.pos.y)
+    canvas.create_rectangle(0 + obj.pos.x, 0 + obj.pos.y, size + obj.pos.x, size + obj.pos.y)
 
-    canvas.create_oval(0 + pos.x, 0 + pos.y, size - 1 + pos.x, size - 1 + pos.y)
-    canvas.create_rectangle(0 + pos.x, 0 + pos.y, size + pos.x, size + pos.y)
 
+cube = PhysObject(Pos2(325, 200), cube_draw_func)
 
-player = PhysObject(Pos2(325, 200), player_draw_func)
-
-game.add_object(player)
+game.add_object(cube)
 
 # Что делать в кадре?
 def main():
