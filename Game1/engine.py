@@ -3,6 +3,13 @@ import tkinter as tk
 
 DELTA = 0.03
 
+def tksleep(root, t: float):
+    ms = int(t*1000)
+    root = tk._get_default_root('sleep')
+    var = tk.IntVar(root)
+    root.after(ms, var.set, 1)
+    root.wait_variable(var)
+
 def clump(value, _min, _max):
     return max(_min, min(_max, value))
 
@@ -99,10 +106,14 @@ class PhysObject(GameObject):
     
     # Рисование объекта
     def draw(self, canvas: tk.Canvas):
-        self.draw_func(canvas, self.pos)
+        self.draw_func(canvas, self)
 
         # Применение физики
         self.physics_func(self)
+    
+    # Клонировать объект
+    def clone(self):
+        return PhysObject(self.pos, self.draw_func, self.physics_func, self.mass)
     
 
 class Game():
@@ -128,7 +139,7 @@ class Game():
                 for obj in self.objects:
                     obj.draw(game_canvas)
 
-                time.sleep(DELTA) # Ожидание 
+                tksleep(root, DELTA) # Ожидание 
     
         except tk.TclError:
             print("Window is closed. Exiting...")

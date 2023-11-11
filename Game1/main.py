@@ -1,5 +1,6 @@
 import tkinter as tk
 import keyboard
+import random
 from engine import *
 
 # Cоздание основного окна
@@ -32,7 +33,9 @@ game.add_object(cube)
 
 # Что делать в кадре?
 def main():
-    pass
+    new = cube.clone()
+    new.pos = Pos2(random.randint(100, 600), 100)
+    game.add_object(new)
 
 # Создание основного цикла игры
 game.mainloop(root, Cnv, main)
