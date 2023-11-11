@@ -20,14 +20,14 @@ game = Game()
 Cnv.pack(fill=tk.BOTH, expand=True)
 
 
-def func(canvas: tk.Canvas, pos: Pos2):
+def player_draw_func(canvas: tk.Canvas, pos: Pos2):
     size = 50
 
     canvas.create_oval(0 + pos.x, 0 + pos.y, size - 1 + pos.x, size - 1 + pos.y)
     canvas.create_rectangle(0 + pos.x, 0 + pos.y, size + pos.x, size + pos.y)
 
 
-player = GameObject(Pos2(325, 200), func)
+player = PhysObject(Pos2(325, 200), player_draw_func)
 
 game.add_object(player)
 

@@ -11,6 +11,10 @@ class Pos2():
         self.x = x
         self.y = y
 
+    def clump(self, _min_x, _max_x, _min_y, _max_y):
+        self.x = clump(self.x, _min_x, _max_x)
+        self.y = clump(self.y, _min_y, _max_y)
+
     def default(*self):
         return Pos2(0, 0)
 
@@ -32,6 +36,10 @@ class Vec2():
         self.x = x
         self.y = y
     
+    def clump(self, _min_x, _max_x, _min_y, _max_y):
+        self.x = clump(self.x, _min_x, _max_x)
+        self.y = clump(self.y, _min_y, _max_y)
+
     def default(*self):
         return Vec2(0, 0)
 
@@ -52,10 +60,6 @@ def empty_draw(canvas: tk.Canvas, pos: Pos2):
     pass
 
 
-def default_phys(canvas: tk.Canvas, pos: Pos2, vec: Vec2):
-    pass
-
-
 # Статичный объект
 class GameObject():
     def __init__(self, pos: Pos2, draw_func: callable = empty_draw):
@@ -68,15 +72,29 @@ class GameObject():
     def draw(self, canvas: tk.Canvas):
         self.draw_func(canvas, self.pos)
 
-
     # Клонировать объект
     def clone(self):
         return GameObject(self.pos, self.draw_func)
 
 
+G = 9.8
+
+
+def default_phys(obj):
+    obj.vec.y += DELTA * obj.mass * G
+
+    obj.pos += Pos2(obj.vec.x, obj.vec.y)
+
+
 class PhysObject(GameObject):
-    def __init__(self, pos: Pos2, draw_func: callable = empty_draw, physics_func: callable = default_phys):
-        super().__init__()
+    def __init__(
+        self,
+        pos: Pos2,
+        draw_func: callable = empty_draw,
+        physics_func: callable = default_phys, mass = 1):
+        super().__init__(pos, draw_func)
+        self.physics_func = physics_func
+        self.mass = mass
         self.vec = Vec2.default()
     
     # Рисование объекта
@@ -84,7 +102,7 @@ class PhysObject(GameObject):
         self.draw_func(canvas, self.pos)
 
         # Применение физики
-        physics_func(canvas, pos, vec)
+        self.physics_func(self)
     
 
 class Game():
