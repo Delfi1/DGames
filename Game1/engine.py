@@ -1,14 +1,22 @@
 import time
 import tkinter as tk
 
-DELTA = 0.03
+def tksleep(self, time:float) -> None:
+    self.after(int(time*1000), self.quit)
+    self.mainloop()
+tk.Misc.tksleep = tksleep
+
+DELTA = 0.02
 
 def tksleep(root, t: float):
-    ms = int(t*1000)
-    root = tk._get_default_root('sleep')
-    var = tk.IntVar(root)
-    root.after(ms, var.set, 1)
-    root.wait_variable(var)
+    try:
+        ms = int(t*1000)
+        root = tk._get_default_root('sleep')
+        var = tk.IntVar(root)
+        root.after(ms, var.set, 1)
+        root.wait_variable(var)
+    except:
+        pass
 
 def clump(value, _min, _max):
     return max(_min, min(_max, value))
@@ -139,7 +147,7 @@ class Game():
                 for obj in self.objects:
                     obj.draw(game_canvas)
 
-                tksleep(root, DELTA) # Ожидание 
+                root.tksleep(DELTA) # Ожидание 
     
         except tk.TclError:
             print("Window is closed. Exiting...")
