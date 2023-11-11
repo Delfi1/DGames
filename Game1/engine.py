@@ -48,25 +48,44 @@ class Vec2():
         return Vec2(self.x * value, self.y * value)
 
 
+def empty_draw(canvas: tk.Canvas, pos: Pos2):
+    pass
+
+
+def default_phys(canvas: tk.Canvas, pos: Pos2, vec: Vec2):
+    pass
+
+
+# Статичный объект
 class GameObject():
-    def __init__(self, pos: Pos2, draw_func: callable):
+    def __init__(self, pos: Pos2, draw_func: callable = empty_draw):
         self.pos = pos
 
         self.vec = Vec2.default()
         self.draw_func = draw_func
 
+    # Рисование объекта
     def draw(self, canvas: tk.Canvas):
         self.draw_func(canvas, self.pos)
-        self.pos = Pos2(self.pos.x, self.pos.y)
-        
-        # self.moving()
 
+
+    # Клонировать объект
     def clone(self):
         return GameObject(self.pos, self.draw_func)
 
-    def __del__(self):
-        self = None
 
+class PhysObject(GameObject):
+    def __init__(self, pos: Pos2, draw_func: callable = empty_draw, physics_func: callable = default_phys):
+        super().__init__()
+        self.vec = Vec2.default()
+    
+    # Рисование объекта
+    def draw(self, canvas: tk.Canvas):
+        self.draw_func(canvas, self.pos)
+
+        # Применение физики
+        physics_func(canvas, pos, vec)
+    
 
 class Game():
     def __init__(self):
@@ -76,7 +95,6 @@ class Game():
         for obj in list(objs):
             if not(obj in self.objects):
                 self.objects.append(obj)
-        print(self.objects)
 
     def mainloop(self, root: tk.Tk, game_canvas: tk.Canvas, _main: callable):
         try:
