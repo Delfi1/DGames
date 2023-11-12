@@ -29,6 +29,10 @@ def cube_draw_func(canvas: tk.Canvas, pos: Pos2):
     canvas.create_oval(pos.x -size/2, pos.y - size/2, size/2 - 1 + pos.x, size/2 - 1 + pos.y)
     canvas.create_rectangle(pos.x -size/2, pos.y - size/2, size/2 + pos.x, size/2 + pos.y)
 
+btn1 = button(Pos2(10, 10), Pos2(120, 30))
+
+game.add_gui(btn1)
+
 cube = PhysObject(Pos2(100, 100), cube_draw_func)
 camera = Camera2D(Pos2(0, 0))
 

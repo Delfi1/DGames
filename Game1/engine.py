@@ -82,7 +82,6 @@ class GameObject():
     script: callable = default_script, data: dict = default_data):
         self.pos = pos
 
-        self.vec = Vec2.default()
         self.draw_func = draw_func
         self.script = script
 
@@ -172,6 +171,32 @@ class Camera2D(PhysObject):
         self.physics_func(self)
         
 
+class gui():
+    def __init__(self, pos: Pos2,
+    gui_draw: callable = empty_draw,
+    gui_script: callable = default_script):
+        self.pos = pos
+        self.gui_draw = gui_draw
+        self.gui_script = gui_script
+
+    def draw(self, canvas: tk.Canvas):
+        self.gui_draw(canvas, self)
+        self.gui_script(self)
+
+def default_button_draw(canvas, g):
+    canvas.create_rectangle(g.pos.x, g.pos.y, g.point.x + g.pos.x, g.point.y + g.pos.y)
+
+class button(gui):
+    def __init__(self,
+        point1: Pos2, point2: Pos2,
+        gui_draw: callable = default_button_draw, gui_script: callable = default_script):
+        super().__init__(point1, gui_draw, gui_script)
+        self.point = point2
+    
+    def draw(self, canvas: tk.Canvas):
+        super().draw(canvas)
+
+
 def root_center(root: tk.Tk) -> Pos2:
     return Pos2(root.winfo_width()//2, root.winfo_height()//2)
 
@@ -179,6 +204,7 @@ def root_center(root: tk.Tk) -> Pos2:
 class Game():
     def __init__(self, root: tk.Tk):
         self.objects = []
+        self.guis = []
         self.root = root
 
     def add_object(self, *objs: GameObject):
@@ -186,6 +212,11 @@ class Game():
             if not(obj in self.objects):
                 self.objects.append(obj)
 
+    def add_gui(self, *guis: gui):
+        for g in list(guis):
+            if not(g in self.guis):
+                self.guis.append(g)
+    
     def find_camera(self, objects: list) -> Camera2D | None:
         for obj in list(objects):
             if obj._type() == "Camera2D":
@@ -203,6 +234,10 @@ class Game():
                 game_canvas.delete('all')
 
                 current_camera = self.find_camera(self.objects)
+
+                # Отрисовка gui объектов
+                for g in self.guis:
+                    g.draw(game_canvas)
 
                 # Отрисовка всех объектов на экране
                 for obj in self.objects:
