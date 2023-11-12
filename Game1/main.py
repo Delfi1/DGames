@@ -37,7 +37,7 @@ game.add_object(camera, rect1)
 is_fullscreen = False
 is_spawn = False
 
-def can_spawn():
+def can_spawn(event):
     global is_spawn
     is_spawn = not(is_spawn)
 

@@ -10,16 +10,6 @@ tk.Misc.tksleep = tksleep
 
 DELTA = 1/60 # 60 кадров в секунду
 
-def tksleep(root, t: float):
-    try:
-        ms = int(t*1000)
-        root = tk._get_default_root('sleep')
-        var = tk.IntVar(root)
-        root.after(ms, var.set, 1)
-        root.wait_variable(var)
-    except:
-        pass
-
 def clump(value, _min, _max):
     return max(_min, min(_max, value))
 
@@ -159,8 +149,10 @@ class PhysObject(GameObject):
 
 
 def camera_draw(canvas: tk.Canvas, pos: Pos2):
-    size = 15
+    size = 16
     canvas.create_oval(pos.x -size/2, pos.y - size/2, size/2 + pos.x, size/2 + pos.y)
+    canvas.create_line(pos.x, pos.y - size/2, pos.x, pos.y + size/2)
+    canvas.create_line(pos.x - size/2, pos.y, pos.x + size/2, pos.y)
 
 
 def camera_phys(obj):
