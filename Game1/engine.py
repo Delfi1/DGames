@@ -1,4 +1,5 @@
 import time
+import keyboard
 import random
 import tkinter as tk
 
@@ -7,7 +8,7 @@ def tksleep(self, time:float) -> None:
     self.mainloop()
 tk.Misc.tksleep = tksleep
 
-DELTA = 0.02
+DELTA = 1/60 # 60 кадров в секунду
 
 def tksleep(root, t: float):
     try:
@@ -27,15 +28,12 @@ class Pos2():
         self.x = x
         self.y = y
 
-    def clump(self, _min_x, _max_x, _min_y, _max_y):
+    def clump(self, _min_x, _min_y, _max_x, _max_y):
         self.x = clump(self.x, _min_x, _max_x)
         self.y = clump(self.y, _min_y, _max_y)
 
     def default(*self):
         return Pos2(0, 0)
-
-    def length(*self) -> float:
-        return (self.x**2 + self.y**2) ** (1/2)
 
     def __str__(self):
         return str((self.x, self.y))
@@ -45,9 +43,6 @@ class Pos2():
 
     def __sub__(self, other):
         return Vec2(self.x - other.x, self.y - other.y)
-
-    #def __mul__(self, other):
-    #s    return Vec2(self.x * value, self.y * value)
 
 
 class Vec2():
@@ -55,12 +50,15 @@ class Vec2():
         self.x = x
         self.y = y
     
-    def clump(self, _min_x, _max_x, _min_y, _max_y):
+    def clump(self, _min_x, _min_y, _max_x, _max_y):
         self.x = clump(self.x, _min_x, _max_x)
         self.y = clump(self.y, _min_y, _max_y)
 
     def default(*self):
         return Vec2(0, 0)
+
+    def length(*self) -> float:
+        return (self.x**2 + self.y**2) ** (1/2)
 
     def __str__(self):
         return str((self.x, self.y))
@@ -71,19 +69,12 @@ class Vec2():
     def __sub__(self, other):
         return Vec2(self.x - other.x, self.y - other.y)
 
-    def __mul__(self, value: float):
-        return Vec2(self.x * value, self.y * value)
-
 
 def empty_draw(canvas: tk.Canvas, pos: Pos2):
     ...
 
 def default_script(obj):
     ...
-
-def camera_draw(canvas: tk.Canvas, pos: Pos2):
-    size = 15
-    canvas.create_oval(0 + pos.x, 0 + pos.y, size - 1 + pos.x, size - 1 + pos.y)
 
 def gen_id() -> int:
     return random.randint(0, 999999999999)
@@ -133,17 +124,6 @@ class GameObject():
         return self.__class__.__name__
 
 
-class Camera2D(GameObject):
-    def __init__(
-        self,
-        pos: Pos2):
-        super().__init__(pos, camera_draw)
-    
-    # Рисование объекта
-    def draw(self, canvas: tk.Canvas, camera_pos: Pos2):
-        self.draw_func(canvas, camera_pos)
-        self.script(self) # Скрипты работают каждый кадр.
-
 G = 9.8
 
 
@@ -179,21 +159,37 @@ class PhysObject(GameObject):
         return PhysObject(self.pos, self.draw_func, self.physics_func, self.mass)
 
 
+def camera_draw(canvas: tk.Canvas, pos: Pos2):
+    size = 15
+    canvas.create_oval(pos.x -size/2, pos.y - size/2, size/2 + pos.x, size/2 + pos.y)
+
+
+def camera_phys(obj):
+    obj.pos += Pos2(obj.vec.x * DELTA, obj.vec.y * DELTA)
+    print(obj.vec)
+    obj.vec.clump(-50, -50, 50, 50)
+
+
+class Camera2D(PhysObject):
+    def __init__(
+        self,
+        pos: Pos2):
+        super().__init__(pos, camera_draw, camera_phys)
+    
+    # Рисование объекта
+    def draw(self, canvas: tk.Canvas, camera_pos: Pos2):
+        self.draw_func(canvas, camera_pos)
+        self.physics_func(self)
+        
+
 def root_center(root: tk.Tk) -> Pos2:
     return Pos2(root.winfo_width()//2, root.winfo_height()//2)
 
-def is_rendered(root: tk.Tk, obj, cam_pos: Pos2) -> bool:
-    center = root_center(root)
-
-    if obj.pos.y < cam_pos.y - center.y - 100 or obj.pos.y > cam_pos.y + center.y + 100 or obj.pos.x < cam_pos.x - center.x -100 or obj.pos.x > cam_pos.x + center.x + 100:
-        return False
-    else:
-        return True
-
 
 class Game():
-    def __init__(self):
+    def __init__(self, root: tk.Tk):
         self.objects = []
+        self.root = root
 
     def add_object(self, *objs: GameObject):
         for obj in list(objs):
@@ -206,12 +202,12 @@ class Game():
                 return obj
         return None
 
-    def mainloop(self, root: tk.Tk, game_canvas: tk.Canvas, _main: callable):
+    def mainloop(self, game_canvas: tk.Canvas, _main: callable):
         try:
             while True:
                 _main(self) # Вызываем необходимые функции
 
-                root.update() # Обновление Окна
+                self.root.update() # Обновление Окна
 
                 # Очистка Canvas
                 game_canvas.delete('all')
@@ -224,16 +220,16 @@ class Game():
                         continue
                     # Отрисовка камеры, если нужно
                     if obj == current_camera:
-                        obj.draw(game_canvas, root_center(root) + Pos2(-7.5, -7.5))
+                        obj.draw(game_canvas, root_center(self.root))
                         continue
                     if obj.data["removed"] == True:
                         # Удаление объектов с тегом "removed"
                         self.objects.remove(obj)
                         continue
-                    if is_rendered(root, obj, current_camera.pos):
-                        obj.draw(game_canvas, root_center(root) + current_camera.pos)
 
-                root.tksleep(DELTA) # Ожидание 
+                    obj.draw(game_canvas, root_center(self.root) + current_camera.pos)
+
+                self.root.tksleep(DELTA) # Ожидание 
     
         except tk.TclError:
             print("Window is closed. Exiting...")

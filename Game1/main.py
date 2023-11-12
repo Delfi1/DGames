@@ -1,5 +1,3 @@
-import tkinter as tk
-import keyboard
 from engine import *
 
 # Cоздание основного окна
@@ -14,7 +12,7 @@ root.resizable(False, False)
 Cnv = tk.Canvas(root)
 
 # Создание основоного объекта игры
-game = Game()
+game = Game(root)
 
 # Добавляем Canvas на экран
 Cnv.pack(fill=tk.BOTH, expand=True)
@@ -34,14 +32,35 @@ def cube_draw_func(canvas: tk.Canvas, pos: Pos2):
 cube = PhysObject(Pos2(100, 100), cube_draw_func)
 camera = Camera2D(Pos2(0, 0))
 
-game.add_object(rect1)
-game.add_object(camera)
+game.add_object(camera, rect1)
+
+is_spawn = False
 
 # Что делать в кадре?
+counter = 0
 def main(_game: Game):
-    new_cube = cube.clone()
-    new_cube.pos = Pos2(random.randint(-250, 250), 0)
-    _game.add_object(new_cube)
+    global counter
+    global is_spawn
+
+    if keyboard.is_pressed('e'):
+        is_spawn = not(is_spawn)
+    
+    if is_spawn:
+        new_cube = cube.clone()
+        counter += 1
+        new_cube.pos = Pos2(random.randint(-250, 250), 0)
+        _game.add_object(new_cube)
+        print(f"Всего объектов: {counter}")
+    
+    if keyboard.is_pressed('w'):
+        camera.vec.y += 5
+    if keyboard.is_pressed('s'):
+        camera.vec.y -= 5
+    if keyboard.is_pressed('a'):
+        camera.vec.x += 5
+    if keyboard.is_pressed('d'):
+        camera.vec.x -= 5
+
 
 # Создание основного цикла игры
-game.mainloop(root, Cnv, main)
+game.mainloop(Cnv, main)
