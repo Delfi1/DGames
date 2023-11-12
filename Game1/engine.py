@@ -196,10 +196,26 @@ class button(gui):
     def draw(self, canvas: tk.Canvas):
         super().draw(canvas)
 
+def default_rectangle_draw(canvas, g):
+    canvas.create_rectangle(g.pos.x, g.pos.y, g.point.x + g.pos.x, g.point.y + g.pos.y, fill=g.color)
+
+class rectangle(gui):
+    def __init__(self,
+        point1: Pos2, point2: Pos2,
+        color="black", border: float = 0.1,
+        gui_draw: callable = default_rectangle_draw, gui_script: callable = default_script):
+        super().__init__(point1, gui_draw, gui_script)
+        self.point = point2
+        self.color = color
+        self.border = border
+        self.border_color = "black"
+    
+    def draw(self, canvas: tk.Canvas):
+        super().draw(canvas)
+
 
 def root_center(root: tk.Tk) -> Pos2:
     return Pos2(root.winfo_width()//2, root.winfo_height()//2)
-
 
 class Game():
     def __init__(self, root: tk.Tk):

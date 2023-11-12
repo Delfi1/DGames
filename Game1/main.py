@@ -17,26 +17,19 @@ game = Game(root)
 # Добавляем Canvas на экран
 Cnv.pack(fill=tk.BOTH, expand=True)
 
-def draw_rec(canvas: tk.Canvas, pos: Pos2):
-    width = 550
-    height = 50
-    canvas.create_rectangle(pos.x -width/2, pos.y - height/2, width/2 + pos.x, height/2 + pos.y)
-
-rect1 = GameObject(Pos2(0, 0), draw_rec)
-
 def cube_draw_func(canvas: tk.Canvas, pos: Pos2):
     size = 50
     canvas.create_oval(pos.x -size/2, pos.y - size/2, size/2 - 1 + pos.x, size/2 - 1 + pos.y)
     canvas.create_rectangle(pos.x -size/2, pos.y - size/2, size/2 + pos.x, size/2 + pos.y)
 
-btn1 = button(Pos2(10, 10), Pos2(120, 30))
+rect1 = rectangle(Pos2(10, 10), Pos2(120, 30))
 
-game.add_gui(btn1)
+game.add_gui(rect1)
 
 cube = PhysObject(Pos2(100, 100), cube_draw_func)
 camera = Camera2D(Pos2(0, 0))
 
-game.add_object(camera, rect1)
+game.add_object(camera)
 
 is_fullscreen = False
 is_spawn = False
