@@ -34,17 +34,22 @@ camera = Camera2D(Pos2(0, 0))
 
 game.add_object(camera, rect1)
 
+is_fullscreen = False
 is_spawn = False
+
+def can_spawn():
+    global is_spawn
+    is_spawn = not(is_spawn)
+
+root.bind('<e>', lambda e:can_spawn(e))
 
 # Что делать в кадре?
 counter = 0
 def main(_game: Game):
     global counter
     global is_spawn
+    global is_fullscreen
 
-    if keyboard.is_pressed('e'):
-        is_spawn = not(is_spawn)
-    
     if is_spawn:
         new_cube = cube.clone()
         counter += 1
@@ -60,7 +65,11 @@ def main(_game: Game):
         camera.vec.x += 5
     if keyboard.is_pressed('d'):
         camera.vec.x -= 5
-
+    
+    if keyboard.is_pressed("F11"):
+        is_fullscreen = not(is_fullscreen)
+        _game.root.attributes("-fullscreen", is_fullscreen)
+    
 
 # Создание основного цикла игры
 game.mainloop(Cnv, main)

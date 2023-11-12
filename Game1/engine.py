@@ -129,7 +129,6 @@ G = 9.8
 
 def default_phys(obj):
     obj.vec.y += DELTA * obj.mass * G # Земная гравитация
-
     obj.pos += Pos2(obj.vec.x, obj.vec.y)
 
 
@@ -166,7 +165,6 @@ def camera_draw(canvas: tk.Canvas, pos: Pos2):
 
 def camera_phys(obj):
     obj.pos += Pos2(obj.vec.x * DELTA, obj.vec.y * DELTA)
-    print(obj.vec)
     obj.vec.clump(-50, -50, 50, 50)
 
 
