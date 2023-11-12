@@ -1,28 +1,14 @@
 from engine import *
 
-# Cоздание основного окна
-root = tk.Tk()
-
-# Настройка окна
-root.title("Game 1")
-root.geometry("700x500")
-root.resizable(False, False)
-
-# Создание Canvas для отрисовки
-Cnv = tk.Canvas(root)
-
 # Создание основоного объекта игры
-game = Game(root)
-
-# Добавляем Canvas на экран
-Cnv.pack(fill=tk.BOTH, expand=True)
+game = Game(title="Game 1", geometry="700x500", resizable=False)
 
 def cube_draw_func(canvas: tk.Canvas, pos: Pos2):
     size = 50
     canvas.create_oval(pos.x -size/2, pos.y - size/2, size/2 - 1 + pos.x, size/2 - 1 + pos.y)
     canvas.create_rectangle(pos.x -size/2, pos.y - size/2, size/2 + pos.x, size/2 + pos.y)
 
-rect1 = rectangle(Pos2(10, 10), Pos2(120, 30))
+rect1 = rectangle(Pos2(10, 10), Pos2(120, 30), color="white")
 
 game.add_gui(rect1)
 
@@ -38,7 +24,7 @@ def can_spawn(event):
     global is_spawn
     is_spawn = not(is_spawn)
 
-root.bind('<e>', lambda e:can_spawn(e))
+game.root.bind('<e>', lambda e:can_spawn(e))
 
 # Что делать в кадре?
 counter = 0
@@ -63,10 +49,6 @@ def main(_game: Game):
     if keyboard.is_pressed('d'):
         camera.vec.x -= 5
     
-    if keyboard.is_pressed("F11"):
-        is_fullscreen = not(is_fullscreen)
-        _game.root.attributes("-fullscreen", is_fullscreen)
-    
 
 # Создание основного цикла игры
-game.mainloop(Cnv, main)
+game.mainloop(main)

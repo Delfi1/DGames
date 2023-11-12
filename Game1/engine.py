@@ -183,8 +183,10 @@ class gui():
         self.gui_draw(canvas, self)
         self.gui_script(self)
 
+
 def default_button_draw(canvas, g):
     canvas.create_rectangle(g.pos.x, g.pos.y, g.point.x + g.pos.x, g.point.y + g.pos.y)
+
 
 class button(gui):
     def __init__(self,
@@ -196,19 +198,23 @@ class button(gui):
     def draw(self, canvas: tk.Canvas):
         super().draw(canvas)
 
+
 def default_rectangle_draw(canvas, g):
-    canvas.create_rectangle(g.pos.x, g.pos.y, g.point.x + g.pos.x, g.point.y + g.pos.y, fill=g.color)
+    canvas.create_rectangle(g.pos.x,
+    g.pos.y, g.point.x + g.pos.x, g.point.y + g.pos.y,
+    fill=g.color, outline=g.border_color, width=g.border)
+
 
 class rectangle(gui):
     def __init__(self,
         point1: Pos2, point2: Pos2,
-        color="black", border: float = 0.1,
+        color="black", border_color = "black", border: float = 0,
         gui_draw: callable = default_rectangle_draw, gui_script: callable = default_script):
         super().__init__(point1, gui_draw, gui_script)
         self.point = point2
         self.color = color
         self.border = border
-        self.border_color = "black"
+        self.border_color = border_color
     
     def draw(self, canvas: tk.Canvas):
         super().draw(canvas)
@@ -217,11 +223,24 @@ class rectangle(gui):
 def root_center(root: tk.Tk) -> Pos2:
     return Pos2(root.winfo_width()//2, root.winfo_height()//2)
 
+
 class Game():
-    def __init__(self, root: tk.Tk):
+    def __init__(self, title: str, geometry: str, resizable: bool):
         self.objects = []
         self.guis = []
-        self.root = root
+        
+        self.root = tk.Tk() # Cоздание основного окна
+        
+        # Настройка окна
+        self.root.title(title)
+        self.root.geometry(geometry)
+        self.root.resizable(resizable, resizable)
+
+        # Создание Canvas для отрисовки
+        self.game_canvas = tk.Canvas(self.root)
+
+        # Добавляем Canvas на экран
+        self.game_canvas.pack(fill=tk.BOTH, expand=True)
 
     def add_object(self, *objs: GameObject):
         for obj in list(objs):
@@ -238,22 +257,28 @@ class Game():
             if obj._type() == "Camera2D":
                 return obj
         return None
+    
+    def key_pressing(self):
+        if keyboard.is_pressed("F11"):
+            self.root.attributes("-fullscreen", not(root.cget("-fullscreen")))
 
-    def mainloop(self, game_canvas: tk.Canvas, _main: callable):
+    def mainloop(self, _main: callable):
         try:
             while True:
                 _main(self) # Вызываем необходимые функции
 
+                self.key_pressing() # Проверка на нажатие клавиш
+
                 self.root.update() # Обновление Окна
 
                 # Очистка Canvas
-                game_canvas.delete('all')
+                self.game_canvas.delete('all')
 
                 current_camera = self.find_camera(self.objects)
 
                 # Отрисовка gui объектов
                 for g in self.guis:
-                    g.draw(game_canvas)
+                    g.draw(self.game_canvas)
 
                 # Отрисовка всех объектов на экране
                 for obj in self.objects:
@@ -261,14 +286,14 @@ class Game():
                         continue
                     # Отрисовка камеры, если нужно
                     if obj == current_camera:
-                        obj.draw(game_canvas, root_center(self.root))
+                        obj.draw(self.game_canvas, root_center(self.root))
                         continue
                     if obj.data["removed"] == True:
                         # Удаление объектов с тегом "removed"
                         self.objects.remove(obj)
                         continue
 
-                    obj.draw(game_canvas, root_center(self.root) + current_camera.pos)
+                    obj.draw(self.game_canvas, root_center(self.root) + current_camera.pos)
 
                 self.root.tksleep(DELTA) # Ожидание 
     
