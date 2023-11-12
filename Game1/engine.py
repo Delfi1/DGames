@@ -113,6 +113,7 @@ class GameObject():
     # Рисование объекта
     def draw(self, canvas: tk.Canvas, camera_pos: Pos2):
         self.draw_func(canvas, self.pos+camera_pos)
+
         self.script(self) # Скрипты работают каждый кадр.
 
     def remove(self):
@@ -147,7 +148,7 @@ G = 9.8
 
 
 def default_phys(obj):
-    obj.vec.y += DELTA * obj.mass * G
+    obj.vec.y += DELTA * obj.mass * G # Земная гравитация
 
     obj.pos += Pos2(obj.vec.x, obj.vec.y)
 
@@ -164,13 +165,11 @@ class PhysObject(GameObject):
         self.vec = Vec2.default()
     
     # Рисование объекта
-    def draw(self, canvas: tk.Canvas):
-        self.draw_func(canvas, self)
+    def draw(self, canvas: tk.Canvas, camera_pos: Pos2):
+        super().draw(canvas, camera_pos)
 
         # Применение физики
         self.physics_func(self)
-
-        self.script(self) # Скрипты работают каждый кадр.
 
     def set_physics(self, new_phys):
         self.physics_func = new_phys
@@ -179,14 +178,18 @@ class PhysObject(GameObject):
     def clone(self):
         return PhysObject(self.pos, self.draw_func, self.physics_func, self.mass)
 
-def is_rendered(root: tk.Tk, obj) -> bool:
-    if obj.pos.y < -100 or obj.pos.y > root.winfo_height() + 100 or obj.pos.x < -100 or obj.pos.x > root.winfo_width() + 100:
+
+def root_center(root: tk.Tk) -> Pos2:
+    return Pos2(root.winfo_width()//2, root.winfo_height()//2)
+
+def is_rendered(root: tk.Tk, obj, cam_pos: Pos2) -> bool:
+    center = root_center(root)
+
+    if obj.pos.y < cam_pos.y - center.y - 100 or obj.pos.y > cam_pos.y + center.y + 100 or obj.pos.x < cam_pos.x - center.x -100 or obj.pos.x > cam_pos.x + center.x + 100:
         return False
     else:
         return True
 
-def root_center(root: tk.Tk) -> Pos2:
-    return Pos2(root.winfo_width()//2, root.winfo_height()//2)
 
 class Game():
     def __init__(self):
@@ -197,8 +200,8 @@ class Game():
             if not(obj in self.objects):
                 self.objects.append(obj)
 
-    def find_camera(self) -> Camera2D | None:
-        for obj in list(self.objects):
+    def find_camera(self, objects: list) -> Camera2D | None:
+        for obj in list(objects):
             if obj._type() == "Camera2D":
                 return obj
         return None
@@ -213,7 +216,7 @@ class Game():
                 # Очистка Canvas
                 game_canvas.delete('all')
 
-                current_camera = self.find_camera()
+                current_camera = self.find_camera(self.objects)
 
                 # Отрисовка всех объектов на экране
                 for obj in self.objects:
@@ -227,8 +230,8 @@ class Game():
                         # Удаление объектов с тегом "removed"
                         self.objects.remove(obj)
                         continue
-                    if is_rendered(root, obj):
-                        obj.draw(game_canvas, root_center(root) + Pos2(-7.5, -7.5) + current_camera.pos)
+                    if is_rendered(root, obj, current_camera.pos):
+                        obj.draw(game_canvas, root_center(root) + current_camera.pos)
 
                 root.tksleep(DELTA) # Ожидание 
     
