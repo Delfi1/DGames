@@ -1,4 +1,5 @@
 import time
+import random
 import tkinter as tk
 
 def tksleep(self, time:float) -> None:
@@ -72,24 +73,52 @@ class Vec2():
 
 
 def empty_draw(canvas: tk.Canvas, obj):
-    pass
+    ...
 
+def default_script(obj):
+    ...
+
+def gen_id() -> int:
+    return random.randint(0, 999999999999)
+
+
+default_data = {
+    "id": 0,
+}
 
 # Статичный объект
 class GameObject():
-    def __init__(self, pos: Pos2, draw_func: callable = empty_draw):
+    def __init__(self, pos: Pos2,
+    draw_func: callable = empty_draw,
+    script: callable = default_script, data: dict = default_data):
         self.pos = pos
 
         self.vec = Vec2.default()
         self.draw_func = draw_func
+        self.script = script
+
+        self.data = data
+
+        self.data["id"] = gen_id()
+        self.data["removed"] = False
 
     # Рисование объекта
     def draw(self, canvas: tk.Canvas):
         self.draw_func(canvas, self)
+        self.script(self) # Скрипты работают каждый кадр.
+
+    def remove(self):
+        self.data["removed"] = True
+
+    def set_script(self, new_script: callable):
+        self.script = new_script
 
     # Клонировать объект
     def clone(self):
-        return GameObject(self.pos, self.draw_func)
+        return GameObject(self.pos, self.draw_func, self.script, self.data)
+
+    def __str__(self):
+        return str(self.data["id"])
 
 
 G = 9.8
@@ -118,11 +147,21 @@ class PhysObject(GameObject):
 
         # Применение физики
         self.physics_func(self)
+
+        self.script(self) # Скрипты работают каждый кадр.
+
+    def set_physics(self, new_phys):
+        self.physics_func = new_phys
     
     # Клонировать объект
     def clone(self):
         return PhysObject(self.pos, self.draw_func, self.physics_func, self.mass)
-    
+
+def is_rendered(root: tk.Tk, obj) -> bool:
+    if obj.pos.y < -100 or obj.pos.y > root.winfo_height() + 100 or obj.pos.x < -100 or obj.pos.x > root.winfo_width() + 100:
+        return False
+    else:
+        return True
 
 class Game():
     def __init__(self):
@@ -136,7 +175,7 @@ class Game():
     def mainloop(self, root: tk.Tk, game_canvas: tk.Canvas, _main: callable):
         try:
             while True:
-                _main() # Вызываем необходимые функции
+                _main(self) # Вызываем необходимые функции
 
                 root.update() # Обновление Окна
 
@@ -145,7 +184,10 @@ class Game():
 
                 # Отрисовка всех объектов на экране
                 for obj in self.objects:
-                    obj.draw(game_canvas)
+                    if obj.data["removed"] == True:
+                        self.objects.remove(obj)
+                    if is_rendered(root, obj):
+                        obj.draw(game_canvas)
 
                 root.tksleep(DELTA) # Ожидание 
     

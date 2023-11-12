@@ -1,6 +1,5 @@
 import tkinter as tk
 import keyboard
-import random
 from engine import *
 
 # Cоздание основного окна
@@ -26,16 +25,18 @@ def cube_draw_func(canvas: tk.Canvas, obj):
     canvas.create_oval(0 + obj.pos.x, 0 + obj.pos.y, size - 1 + obj.pos.x, size - 1 + obj.pos.y)
     canvas.create_rectangle(0 + obj.pos.x, 0 + obj.pos.y, size + obj.pos.x, size + obj.pos.y)
 
+def cube_phys(obj):
+    pass
 
-cube = PhysObject(Pos2(325, 200), cube_draw_func)
-
-game.add_object(cube)
+cube = PhysObject(Pos2(325, 100), cube_draw_func)
 
 # Что делать в кадре?
-def main():
+def main(_game: Game):
     new = cube.clone()
+
     new.pos = Pos2(random.randint(100, 600), 100)
-    game.add_object(new)
+    
+    _game.add_object(new)
 
 # Создание основного цикла игры
 game.mainloop(root, Cnv, main)
