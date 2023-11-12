@@ -34,6 +34,9 @@ class Pos2():
     def default(*self):
         return Pos2(0, 0)
 
+    def length(*self) -> float:
+        return (self.x**2 + self.y**2) ** (1/2)
+
     def __str__(self):
         return str((self.x, self.y))
 
@@ -43,8 +46,8 @@ class Pos2():
     def __sub__(self, other):
         return Vec2(self.x - other.x, self.y - other.y)
 
-    def __mul__(self, value: float):
-        return Vec2(self.x * value, self.y * value)
+    #def __mul__(self, other):
+    #s    return Vec2(self.x * value, self.y * value)
 
 
 class Vec2():
@@ -72,11 +75,15 @@ class Vec2():
         return Vec2(self.x * value, self.y * value)
 
 
-def empty_draw(canvas: tk.Canvas, obj):
+def empty_draw(canvas: tk.Canvas, pos: Pos2):
     ...
 
 def default_script(obj):
     ...
+
+def camera_draw(canvas: tk.Canvas, pos: Pos2):
+    size = 15
+    canvas.create_oval(0 + pos.x, 0 + pos.y, size - 1 + pos.x, size - 1 + pos.y)
 
 def gen_id() -> int:
     return random.randint(0, 999999999999)
@@ -85,6 +92,7 @@ def gen_id() -> int:
 default_data = {
     "id": 0,
 }
+
 
 # Статичный объект
 class GameObject():
@@ -103,8 +111,8 @@ class GameObject():
         self.data["removed"] = False
 
     # Рисование объекта
-    def draw(self, canvas: tk.Canvas):
-        self.draw_func(canvas, self)
+    def draw(self, canvas: tk.Canvas, camera_pos: Pos2):
+        self.draw_func(canvas, self.pos+camera_pos)
         self.script(self) # Скрипты работают каждый кадр.
 
     def remove(self):
@@ -120,6 +128,20 @@ class GameObject():
     def __str__(self):
         return str(self.data["id"])
 
+    def _type(self) -> str:
+        return self.__class__.__name__
+
+
+class Camera2D(GameObject):
+    def __init__(
+        self,
+        pos: Pos2):
+        super().__init__(pos, camera_draw)
+    
+    # Рисование объекта
+    def draw(self, canvas: tk.Canvas, camera_pos: Pos2):
+        self.draw_func(canvas, camera_pos)
+        self.script(self) # Скрипты работают каждый кадр.
 
 G = 9.8
 
@@ -163,6 +185,9 @@ def is_rendered(root: tk.Tk, obj) -> bool:
     else:
         return True
 
+def root_center(root: tk.Tk) -> Pos2:
+    return Pos2(root.winfo_width()//2, root.winfo_height()//2)
+
 class Game():
     def __init__(self):
         self.objects = []
@@ -171,6 +196,12 @@ class Game():
         for obj in list(objs):
             if not(obj in self.objects):
                 self.objects.append(obj)
+
+    def find_camera(self) -> Camera2D | None:
+        for obj in list(self.objects):
+            if obj._type() == "Camera2D":
+                return obj
+        return None
 
     def mainloop(self, root: tk.Tk, game_canvas: tk.Canvas, _main: callable):
         try:
@@ -182,12 +213,22 @@ class Game():
                 # Очистка Canvas
                 game_canvas.delete('all')
 
+                current_camera = self.find_camera()
+
                 # Отрисовка всех объектов на экране
                 for obj in self.objects:
+                    if current_camera == None:
+                        continue
+                    # Отрисовка камеры, если нужно
+                    if obj == current_camera:
+                        obj.draw(game_canvas, root_center(root) + Pos2(-7.5, -7.5))
+                        continue
                     if obj.data["removed"] == True:
+                        # Удаление объектов с тегом "removed"
                         self.objects.remove(obj)
+                        continue
                     if is_rendered(root, obj):
-                        obj.draw(game_canvas)
+                        obj.draw(game_canvas, root_center(root) + Pos2(-7.5, -7.5) + current_camera.pos)
 
                 root.tksleep(DELTA) # Ожидание 
     
