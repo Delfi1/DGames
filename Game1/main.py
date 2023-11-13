@@ -1,9 +1,12 @@
-from engine import *
+from engine import Game, Pos2, keyboard
+from objects import PhysObject, Camera2D
+from GUI import button, rectangle
+from tkinter import Canvas
 
 # Создание основоного объекта игры
 game = Game(title="Game 1", geometry="700x500", resizable=False)
 
-def cube_draw_func(canvas: tk.Canvas, pos: Pos2):
+def cube_draw_func(canvas: Canvas, pos: Pos2):
     size = 50
     canvas.create_oval(pos.x -size/2, pos.y - size/2, size/2 - 1 + pos.x, size/2 - 1 + pos.y)
     canvas.create_rectangle(pos.x -size/2, pos.y - size/2, size/2 + pos.x, size/2 + pos.y)
@@ -12,12 +15,11 @@ rect1 = rectangle(Pos2(10, 10), Pos2(120, 30), color="white")
 
 game.add_gui(rect1)
 
-cube = PhysObject(Pos2(100, 100), cube_draw_func)
+cube = PhysObject(Pos2(0, 0), cube_draw_func)
 camera = Camera2D(Pos2(0, 0))
 
-game.add_object(camera)
+game.add_object(camera, cube)
 
-is_fullscreen = False
 is_spawn = False
 
 def can_spawn(event):
@@ -31,7 +33,6 @@ counter = 0
 def main(_game: Game):
     global counter
     global is_spawn
-    global is_fullscreen
 
     if is_spawn:
         new_cube = cube.clone()
