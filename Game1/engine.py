@@ -39,6 +39,9 @@ class Game():
     def add_object(self, *objs: GameObject):
         for obj in list(objs):
             if not(obj in self.objects):
+                print(obj)
+                if obj._type() == "Camera2D" and self.find_camera(self.objects) != None:
+                    self.objects.remove(self.find_camera(self.objects))
                 self.objects.append(obj)
 
     def add_gui(self, *guis: gui_obj):
@@ -63,7 +66,7 @@ class Game():
 
     def debug_menu(self, fps):
         debug_rect = rectangle(Pos4(2, 2, 302, 152), color="grey", border=1)
-        debug_rect.draw(self.game_canvas, self.root)
+        debug_rect.draw(self.game_canvas)
 
     def mainloop(self, _main: callable):
         try:
@@ -82,7 +85,7 @@ class Game():
 
                 # Отрисовка gui объектов
                 for g in self.guis:
-                    g.draw(self.game_canvas, self.root)
+                    g.draw(self.game_canvas)
 
                 # Отрисовка всех объектов на экране
                 for obj in self.objects:
@@ -90,7 +93,8 @@ class Game():
                         continue
                     # Отрисовка камеры, если нужно
                     if obj == current_camera:
-                        #obj.draw(self.game_canvas, screen_center(self.root))
+                        if self.debug_mode:
+                            obj.render(self.game_canvas, get_delta(start_), screen_center(self.root))
                         continue
                     
                     render_pos = obj.pos + screen_center(self.root) + current_camera.pos

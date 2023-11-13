@@ -16,9 +16,6 @@ rect1 = rectangle(Pos4(10, 10, 120, 40), color="blue", anchor_x="left", anchor_y
 game.add_gui(rect1)
 
 cube = PhysObject(Pos2(0, 0), cube_draw_func)
-camera = Camera2D(Pos2(0, 0))
-
-game.add_object(camera)
 
 is_spawn = False
 
@@ -33,7 +30,7 @@ counter = 0
 def main(_game: Game):
     global counter
     global is_spawn
-    
+
     if is_spawn:
         new_cube = cube.clone()
         counter += 1

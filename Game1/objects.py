@@ -76,8 +76,10 @@ class PhysObject(GameObject):
 def camera_render(canvas: GameCanvas, pos: Pos2):
     size = 16
     canvas.create_oval(pos.x -size/2, pos.y - size/2, size/2 + pos.x, size/2 + pos.y)
-    canvas.create_line(pos.x, pos.y - size/2, pos.x, pos.y + size/2)
-    canvas.create_line(pos.x - size/2, pos.y, pos.x + size/2, pos.y)
+    canvas.create_line(pos.x, 0, pos.x, canvas.winfo_height())
+    canvas.create_line(0, pos.y, canvas.winfo_width(), pos.y)
+    #canvas.create_line(pos.x, pos.y - size/2, pos.x, pos.y + size/2)
+    #canvas.create_line(pos.x - size/2, pos.y, pos.x + size/2, pos.y)
 
 
 def camera_phys(obj, delta):
@@ -93,5 +95,5 @@ class Camera2D(PhysObject):
     
     # Рисование объекта
     def render(self, canvas: GameCanvas, delta_: float, render_pos: Pos2):
-        self.render_func(canvas, delta_, render_pos)
+        self.render_func(canvas, render_pos)
         self.physics_func(self, delta_)
