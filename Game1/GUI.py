@@ -113,7 +113,6 @@ class rectangle(gui_obj):
         return Pos4(render_x1, render_y1, render_x2, render_y2)
 
     def draw(self, canvas: GameCanvas, root: Window):
-        print(type(self.gui_draw))
         self.gui_draw(canvas, self.gui_pos(root), self)
         self.gui_script(self)
 

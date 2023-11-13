@@ -43,7 +43,6 @@ class GameObject():
 
 
 def default_phys(obj, delta):
-    print(obj.pos)
     obj.vec.y += delta * obj.mass * constants.G # Земная гравитация
     obj.pos += Pos2(obj.vec.x, obj.vec.y)
 

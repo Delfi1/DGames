@@ -1,4 +1,4 @@
-from GUI import gui_obj, screen_center
+from GUI import gui_obj, screen_center, rectangle
 from objects import GameObject, Camera2D
 from matrix import *
 from maths import get_delta, default_delta
@@ -20,7 +20,7 @@ class Game():
         self.guis = []
         
         self.root = tk.Tk() # Cоздание основного окна
-        
+
         # Настройка окна
         self.root.title(title)
         self.root.geometry(geometry)
@@ -31,6 +31,10 @@ class Game():
 
         # Добавляем Canvas на экран
         self.game_canvas.pack(fill=tk.BOTH, expand=True)
+
+        # Добавляем параметры
+        self.is_fullscreen = False
+        self.debug_mode = False
 
     def add_object(self, *objs: GameObject):
         for obj in list(objs):
@@ -49,8 +53,17 @@ class Game():
         return None
     
     def key_pressing(self):
+        if keyboard.is_pressed("F3"):
+            self.debug_mode = not(self.debug_mode)
+            print(f"Debug mode: {self.debug_mode}")
         if keyboard.is_pressed("F11"):
-            self.root.attributes("-fullscreen", not(self.root.cget("-fullscreen")))
+            print("TEST")
+            self.is_fullscreen = not(self.is_fullscreen)
+            self.root.attributes("-fullscreen", self.is_fullscreen)
+
+    def debug_menu(self, fps):
+        debug_rect = rectangle(Pos4(2, 2, 302, 152), color="grey", border=1)
+        debug_rect.draw(self.game_canvas, self.root)
 
     def mainloop(self, _main: callable):
         try:
@@ -84,7 +97,13 @@ class Game():
 
                     obj.render(self.game_canvas, get_delta(start_), render_pos)
 
-                self.root.tksleep(get_delta(start_)) # Ожидание 
+                if self.debug_mode:
+                    cur_fps = 1/get_delta(start_)
+
+                    self.debug_menu(fps=cur_fps)
+                
+                self.root.tksleep(1/FPS - get_delta(start_)) # Ожидание 
     
-        except tk.TclError:
+        except tk.TclError as e:
+            print(e)
             print("Window is closed. Exiting...")

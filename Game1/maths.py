@@ -10,4 +10,4 @@ def default_delta() -> float:
     return 1/constants.FPS
 
 def get_delta(start_: float) -> float:
-    return 1/constants.FPS - (perf_counter() - start_)
+    return perf_counter() - start_

@@ -33,13 +33,15 @@ counter = 0
 def main(_game: Game):
     global counter
     global is_spawn
-
+    
     if is_spawn:
         new_cube = cube.clone()
         counter += 1
         new_cube.pos = Pos2(random.randint(-250, 250), 0)
         _game.add_object(new_cube)
-        print(f"Всего объектов: {counter}")
+        if counter % 100 == 0:
+            print(f"Всего объектов: {counter}")
+            is_spawn = False
     
     if keyboard.is_pressed('w'):
         camera.vec.y += 5
