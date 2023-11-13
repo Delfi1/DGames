@@ -1,4 +1,4 @@
-from engine import Game, Pos2, keyboard, random
+from engine import Game, Pos2, Pos4, keyboard, random
 from objects import PhysObject, Camera2D
 from GUI import button, rectangle
 from tkinter import Canvas
@@ -11,7 +11,7 @@ def cube_draw_func(canvas: Canvas, pos: Pos2):
     canvas.create_oval(pos.x -size/2, pos.y - size/2, size/2 - 1 + pos.x, size/2 - 1 + pos.y)
     canvas.create_rectangle(pos.x -size/2, pos.y - size/2, size/2 + pos.x, size/2 + pos.y)
 
-rect1 = rectangle(Pos2(10, 10), Pos2(120, 30), color="white")
+rect1 = rectangle(Pos4(10, 10, 120, 40), color="blue", anchor_x="left", anchor_y="bottom")
 
 game.add_gui(rect1)
 

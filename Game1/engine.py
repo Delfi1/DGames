@@ -1,6 +1,6 @@
 from GUI import gui_obj, screen_center
 from objects import GameObject, Camera2D
-from matrix import Pos2, Vec2
+from matrix import *
 from maths import get_delta, default_delta
 from constants import FPS
 
@@ -50,7 +50,7 @@ class Game():
     
     def key_pressing(self):
         if keyboard.is_pressed("F11"):
-            self.root.attributes("-fullscreen", not(root.cget("-fullscreen")))
+            self.root.attributes("-fullscreen", not(self.root.cget("-fullscreen")))
 
     def mainloop(self, _main: callable):
         try:
@@ -69,7 +69,7 @@ class Game():
 
                 # Отрисовка gui объектов
                 for g in self.guis:
-                    g.draw(self.game_canvas)
+                    g.draw(self.game_canvas, self.root)
 
                 # Отрисовка всех объектов на экране
                 for obj in self.objects:
@@ -82,7 +82,7 @@ class Game():
                     
                     render_pos = obj.pos + screen_center(self.root) + current_camera.pos
 
-                    obj.render(self.game_canvas, default_delta(), render_pos)
+                    obj.render(self.game_canvas, get_delta(start_), render_pos)
 
                 self.root.tksleep(get_delta(start_)) # Ожидание 
     

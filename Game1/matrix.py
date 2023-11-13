@@ -22,6 +22,20 @@ class Pos2():
         return Vec2(self.x - other.x, self.y - other.y)
 
 
+class Pos4():
+    def __init__(self, x1, y1, x2, y2):
+        self.x1 = x1
+        self.y1 = y1
+        self.x2 = x2
+        self.y2 = y2
+
+    def default(*self):
+        return Pos4(0, 0, 0, 0)
+
+    def __str__(self):
+        return str(((self.x1, self.y1), (self.x2, self.y2)))
+
+
 class Vec2():
     def __init__(self, x: float, y: float):
         self.x = x

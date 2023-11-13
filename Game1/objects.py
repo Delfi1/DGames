@@ -43,6 +43,7 @@ class GameObject():
 
 
 def default_phys(obj, delta):
+    print(obj.pos)
     obj.vec.y += delta * obj.mass * constants.G # Земная гравитация
     obj.pos += Pos2(obj.vec.x, obj.vec.y)
 
@@ -81,7 +82,7 @@ def camera_render(canvas: GameCanvas, pos: Pos2):
 
 
 def camera_phys(obj, delta):
-    obj.pos += Pos2(obj.vec.x * DELTA, obj.vec.y * delta)
+    obj.pos += Pos2(obj.vec.x * delta, obj.vec.y * delta)
     obj.vec.clump(-50, -50, 50, 50)
 
 
