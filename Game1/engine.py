@@ -1,7 +1,7 @@
 from GUI import gui_obj, screen_center
 from objects import GameObject, Camera2D
 from matrix import Pos2, Vec2
-from maths import get_delta
+from maths import get_delta, default_delta
 from constants import FPS
 
 import time
@@ -82,7 +82,8 @@ class Game():
                     
                     render_pos = obj.pos + screen_center(self.root) + current_camera.pos
 
-                    obj.render(self.game_canvas, get_delta(start_), render_pos)
+                    obj.render(self.game_canvas, default_delta(), render_pos)
+
                 self.root.tksleep(get_delta(start_)) # Ожидание 
     
         except tk.TclError:

@@ -1,4 +1,4 @@
-from engine import Game, Pos2, keyboard
+from engine import Game, Pos2, keyboard, random
 from objects import PhysObject, Camera2D
 from GUI import button, rectangle
 from tkinter import Canvas
@@ -18,7 +18,7 @@ game.add_gui(rect1)
 cube = PhysObject(Pos2(0, 0), cube_draw_func)
 camera = Camera2D(Pos2(0, 0))
 
-game.add_object(camera, cube)
+game.add_object(camera)
 
 is_spawn = False
 
