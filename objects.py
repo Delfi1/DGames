@@ -1,4 +1,5 @@
 from tkinter import Canvas
+import copy
 from maths import Pos2, Size2, Vec2, DELTA
 
 # Статичный объект (без отрисовки и коллизии), точка в пространстве
@@ -15,7 +16,10 @@ class Node():
     def render(self, canvas: Canvas, render_pos: Pos2):
         for c in self.children:
             c.render(canvas, c.pos + render_pos)
-    
+
+    def clone(self):
+        return copy.deepcopy(self)
+
     def __type__(self):
         return self.__class__.__name__
 
