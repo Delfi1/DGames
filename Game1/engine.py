@@ -1,8 +1,8 @@
 from GUI import gui_obj, screen_center, rectangle
 from objects import GameObject, Camera2D
 from matrix import *
-from maths import get_delta, default_delta
-from constants import FPS
+from maths import get_delta
+from constants import FPS, DELTA
 
 import time
 import keyboard
@@ -34,12 +34,11 @@ class Game():
 
         # Добавляем параметры
         self.is_fullscreen = False
-        self.debug_mode = False
+        self.debug_mode = True
 
     def add_object(self, *objs: GameObject):
         for obj in list(objs):
             if not(obj in self.objects):
-                print(obj)
                 if obj._type() == "Camera2D" and self.find_camera(self.objects) != None:
                     self.objects.remove(self.find_camera(self.objects))
                 self.objects.append(obj)
@@ -60,12 +59,13 @@ class Game():
             self.debug_mode = not(self.debug_mode)
             print(f"Debug mode: {self.debug_mode}")
         if keyboard.is_pressed("F11"):
-            print("TEST")
             self.is_fullscreen = not(self.is_fullscreen)
             self.root.attributes("-fullscreen", self.is_fullscreen)
 
     def debug_menu(self, fps):
         debug_rect = rectangle(Pos4(2, 2, 302, 152), color="grey", border=1)
+        debug_rect.add_child()
+
         debug_rect.draw(self.game_canvas)
 
     def mainloop(self, _main: callable):
@@ -94,19 +94,20 @@ class Game():
                     # Отрисовка камеры, если нужно
                     if obj == current_camera:
                         if self.debug_mode:
-                            obj.render(self.game_canvas, get_delta(start_), screen_center(self.root))
+                            obj.render(self.game_canvas, screen_center(self.root))
                         continue
                     
                     render_pos = obj.pos + screen_center(self.root) + current_camera.pos
 
-                    obj.render(self.game_canvas, get_delta(start_), render_pos)
+                    obj.render(self.game_canvas, render_pos)
+
+                render_time = get_delta(start_)
 
                 if self.debug_mode:
-                    cur_fps = 1/get_delta(start_)
-
+                    cur_fps = 1/render_time
                     self.debug_menu(fps=cur_fps)
-                
-                self.root.tksleep(1/FPS - get_delta(start_)) # Ожидание 
+
+                self.root.tksleep(DELTA - render_time) # Ожидание 
     
         except tk.TclError as e:
             print(e)

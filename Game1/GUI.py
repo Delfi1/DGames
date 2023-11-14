@@ -18,32 +18,76 @@ class gui_obj():
         self.anchor_y = anchor_y
         self.gui_draw = gui_draw
         self.gui_script = gui_script
+
+        self.children = []
+
+    def add_child(self, *children):
+        for c in list(children):
+            if not(c in self.children):
+                self.children.append(c)
+
+    def winfo_width():
+        return 0
     
-    def gui_pos(self, canvas: GameCanvas) -> Pos2:
+    def winfo_width():
+        return 0
+
+    def global_gui_pos(self, canvas: GameCanvas) -> Pos2:
         render_x = 0
         match self.anchor_x:
             case "left":
-                render_x = 0 + self.pos.x
+                render_x = self.pos.x
             case "right":
-                render_x = canvas.winfo_width() - self.pos.x
+                render_x = parent.winfo_width() - self.pos.x
             case "center":
-                render_x = canvas.winfo_width()//2 + self.pos.x
+                render_x = parent.winfo_width()//2 + self.pos.x//2
             case _:
-                render_x = 0 + self.pos.x
+                render_x = self.pos.x
         render_y = 0
         match self.anchor_y:
             case "top":
-                render_y = 0 + self.pos.y
+                render_y = self.pos.y
             case "bottom":
-                render_y = canvas.winfo_height() - self.pos.y
+                render_y = parent.winfo_height() - self.pos.y
             case "center":
-                render_y = canvas.winfo_height()//2 + self.pos.y
+                render_y = parent.winfo_height()//2 + self.pos.y//2
             case _:
-                render_y = 0 + self.pos.y
+                render_y = self.pos.y
         return Pos2(render_x, render_y)
 
-    def draw(self, canvas: GameCanvas):
-        self.gui_draw(canvas, self.gui_pos(canvas), self)
+    def gui_pos(self, parent) -> Pos2:
+        render_x = 0
+        match self.anchor_x:
+            case "left":
+                render_x = parent.pos.x + self.pos.x
+            case "right":
+                render_x = parent.winfo_width() + parent.pos.x - self.pos.x
+            case "center":
+                render_x = parent.winfo_width()//2 + parent.pos.x + self.pos.x//2
+            case _:
+                render_x = parent.pos.x + self.pos.x
+        render_y = 0
+        match self.anchor_y:
+            case "top":
+                render_y = parent.pos.y + self.pos.y
+            case "bottom":
+                render_y = parent.winfo_height() + parent.pos.y - self.pos.y
+            case "center":
+                render_y = parent.winfo_height()//2 + parent.pos.y + self.pos.y//2
+            case _:
+                render_y = parent.pos.y + self.pos.y
+        return Pos2(render_x, render_y)
+
+    def draw(self, canvas: GameCanvas, parent=None):
+        if parent is None:
+            render_pos = self.gui_pos(canvas)
+            self.gui_draw(canvas, self.gui_pos(canvas), self)
+        else:
+            self.gui_draw(canvas, self.global_gui_pos(parent), self)
+
+        for c in self.children:
+            c.draw(canvas, )
+
         self.gui_script(self)
 
 

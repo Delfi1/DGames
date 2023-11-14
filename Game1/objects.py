@@ -26,7 +26,7 @@ class GameObject():
         self.data = data
 
     # Рисование объекта
-    def render(self, canvas: GameCanvas, delta_: float, render_pos: Pos2):
+    def render(self, canvas: GameCanvas, render_pos: Pos2):
         self.render_func(canvas, render_pos)
 
         self.script(self) # Скрипты работают каждый кадр.
@@ -59,11 +59,11 @@ class PhysObject(GameObject):
         self.vec = Vec2.default()
     
     # Рисование объекта
-    def render(self, canvas: GameCanvas, delta_: float, render_pos: Pos2):
-        super().render(canvas, delta_, render_pos)
+    def render(self, canvas: GameCanvas, render_pos: Pos2):
+        super().render(canvas, render_pos)
 
         # Применение физики
-        self.physics_func(self, delta_)
+        self.physics_func(self, constants.DELTA)
 
     def set_physics(self, new_phys: callable):
         self.physics_func = new_phys
@@ -94,6 +94,6 @@ class Camera2D(PhysObject):
         super().__init__(pos, camera_render, camera_phys)
     
     # Рисование объекта
-    def render(self, canvas: GameCanvas, delta_: float, render_pos: Pos2):
+    def render(self, canvas: GameCanvas, render_pos: Pos2):
         self.render_func(canvas, render_pos)
-        self.physics_func(self, delta_)
+        self.physics_func(self, constants.DELTA)

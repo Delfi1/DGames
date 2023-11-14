@@ -25,6 +25,9 @@ def can_spawn(event):
 
 game.root.bind('<e>', lambda e:can_spawn(e))
 
+camera = Camera2D(Pos2(0, 0))
+game.add_object(camera)
+
 # Что делать в кадре?
 counter = 0
 def main(_game: Game):
