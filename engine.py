@@ -72,7 +72,9 @@ class Game():
             self.render_screen()
             #self.render_gui(self.canvas)
 
-            _delta2 = time.perf_counter() # Время конца кадра 
-            self.Window.tksleep(DELTA - (_delta2 - _delta1)) # Простой в ожидании след кадра
+            _delta2 = time.perf_counter() # Время конца кадра
+            render_delta = _delta2 - _delta1
+            print(f"FPS: {1/render_delta}")
+            self.Window.tksleep(DELTA - render_delta) # Простой в ожидании след кадра
         
         self.Window.destroy() # Выход из цикла отрисовки, завершение программы
