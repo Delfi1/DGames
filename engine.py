@@ -41,7 +41,7 @@ class Game():
     # Функция рендеринга GUI
     def render_gui(self):
         for obj in self.gui_objects:
-            obj.render()
+            obj.render(self.canvas)
 
     # Функция рендеринга всех объектов
     def render_screen(self):
@@ -70,11 +70,11 @@ class Game():
 
             # Отрисовка всего окна
             self.render_screen()
-            #self.render_gui(self.canvas)
+            self.render_gui()
 
             _delta2 = time.perf_counter() # Время конца кадра
             render_delta = _delta2 - _delta1
-            
+            #print(f"FPS: {1/render_delta}")
             self.Window.tksleep(DELTA - render_delta) # Простой в ожидании след кадра
         
         self.Window.destroy() # Выход из цикла отрисовки, завершение программы
