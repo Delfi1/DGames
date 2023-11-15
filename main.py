@@ -14,13 +14,13 @@ PhysNode.add_child(square1)
 
 game.add_object(PhysNode)
 
-gui1 = Rect(Pos2(0, 10), size=Size2(100, 100), anchor_x="center", anchor_y="top")
+gui1 = Rect(Pos2(5, 5), size=Size2(200, 100))
 
 game.add_gui(gui1)
 
 # Основная функция игры, выполняется каждый кадр
 def main(_game: Game):
+    _game.Window.wm_attributes('-fullscreen', True)
     pass
-
 
 game.mainloop(main)

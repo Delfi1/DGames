@@ -69,6 +69,17 @@ class Game():
             if not(obj in self.gui_objects):
                 self.gui_objects.append(obj) 
 
+    def debug_menu(self, fps: float):
+        # Отрисовка меню Debug
+        window_width = self.Window.winfo_width()
+        window_height = self.Window.winfo_height()
+
+        center = Pos2(window_width//2, window_height//2)
+        radius = 5
+        self.canvas.create_line(0, window_height//2, window_width, window_height//2)
+        self.canvas.create_line(window_width//2, 0, window_width//2, window_height)
+        self.canvas.create_oval(center.x - radius, center.y - radius, center.x + radius, center.y + radius)
+
     def mainloop(self, _main: callable):
         while self.running:
             _delta1 = time.perf_counter() # Время начала кадра
@@ -84,7 +95,7 @@ class Game():
 
             _delta2 = time.perf_counter() # Время конца кадра
             render_delta = _delta2 - _delta1
-            print(f"FPS: {1/render_delta}")
+            self.debug_menu(fps=(1/render_delta))
             self.Window.tksleep(DELTA - render_delta) # Простой в ожидании след кадра
         
         self.Window.destroy() # Выход из цикла отрисовки, завершение программы
