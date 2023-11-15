@@ -35,6 +35,13 @@ class Game():
         self.objects = list()
         self.gui_objects = list()
         self.camera_pos = Pos2(0, 0)
+        
+        # Создание доп параметров
+        self.fullscreen_mode = False
+
+        # Биндинг нужных кнопок
+        self.last_f11_press = 0
+        self.keybinding()
 
     def turn_off(self):
         self.running = False
@@ -68,6 +75,17 @@ class Game():
         for obj in list(objs):
             if not(obj in self.gui_objects):
                 self.gui_objects.append(obj) 
+
+    def keybinding(self):
+        self.Window.bind("<F11>", lambda e: self.switch_full_screen(e))
+
+    def switch_full_screen(self, event):
+        if time.perf_counter() - self.last_f11_press > 0.5:
+            self.last_f11_press = time.perf_counter()
+            self.fullscreen_mode = not(self.fullscreen_mode)
+            self.Window.attributes('-fullscreen', self.fullscreen_mode)
+        else:
+            print(time.perf_counter() - self.last_f11_press)
 
     def debug_menu(self, fps: float):
         # Отрисовка меню Debug

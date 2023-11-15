@@ -20,7 +20,6 @@ game.add_gui(gui1)
 
 # Основная функция игры, выполняется каждый кадр
 def main(_game: Game):
-    _game.Window.wm_attributes('-fullscreen', True)
     pass
 
 game.mainloop(main)
