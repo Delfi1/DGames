@@ -102,7 +102,7 @@ class Game():
         while self.running:
             _delta1 = time.perf_counter() # Время начала кадра
             self.Window.update() # Обновление окна
-            _main(self)
+            _main(self) # Выполнение основной функции
 
             # Очистка холоста
             self.canvas.delete('all')

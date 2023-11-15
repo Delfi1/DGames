@@ -1,3 +1,4 @@
+import tkinter
 from tkinter import Canvas
 from objects import Node
 import copy
@@ -43,10 +44,10 @@ class gui_node():
     def render(self, canvas: Canvas, parent_pos: Pos2, parent_size: Size2):
         render_pos = self.get_anchor_pos(parent_pos, parent_size)
         
-        canvas.create_oval(render_pos.x - 5, render_pos.y - 5, render_pos.x + 5, render_pos.y + 5)
+        #canvas.create_oval(render_pos.x - 5, render_pos.y - 5, render_pos.x + 5, render_pos.y + 5)
         # Отрисовка children относительно parent
         for c in self.children:
-            c.render(canvas, c.pos + self.get_anchor_pos())
+            c.render(canvas, self.get_anchor_pos(parent_pos, parent_size))
         
     def clone(self):
         return copy.deepcopy(self)
@@ -100,4 +101,13 @@ class Button(Rect):
     pass
 
 class Label(gui_node):
-    pass
+    def __init__(self, pos: Pos2, text: str):
+        super().__init__(pos)
+        self.text = text
+    
+    def render(self, canvas, parent_pos, parent_size):
+        render_pos = self.get_anchor_pos(parent_pos, parent_size)
+
+        label = tkinter.Label(canvas, text=self.text)
+        label.place(render_pos)
+        super().render(canvas, parent_pos, parent_size)

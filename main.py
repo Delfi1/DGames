@@ -1,6 +1,6 @@
 from engine import Game
 from objects import PhysicsNode, Square
-from gui import gui_node, Rect
+from gui import gui_node, Rect, Label
 from maths import Pos2, Vec2, Size2
 import random
 
@@ -14,8 +14,10 @@ PhysNode.add_child(square1)
 
 game.add_object(PhysNode)
 
-gui1 = Rect(Pos2(5, 5), size=Size2(200, 100))
+gui1 = Rect(Pos2(5, 5), size=Size2(100, 100), color="black")
 
+#testLabel = Label(pos=Pos2(0, 5), text="Test")
+#gui1.add_child(testLabel)
 game.add_gui(gui1)
 
 # Основная функция игры, выполняется каждый кадр
