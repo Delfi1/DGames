@@ -35,7 +35,7 @@ class Size2():
         return Size2(0, 0)
 
     def __str__(self):
-        return str((self.x, self.y))
+        return str((self.width, self.height))
 
     def __add__(self, other):
         return Vec2(self.x + other.x, self.y + other.y)

@@ -1,6 +1,7 @@
 import tkinter as tk
-from maths import Pos2, FPS, DELTA
+from maths import Pos2, Size2, FPS, DELTA
 from objects import Node, Square
+from gui import gui_node
 
 import time
 
@@ -40,8 +41,11 @@ class Game():
 
     # Функция рендеринга GUI
     def render_gui(self):
+        WPos = Pos2(0, 0) # Верхний левый угол
+        WSize = Size2(self.Window.winfo_width(), self.Window.winfo_height()) # Размеры окна
+
         for obj in self.gui_objects:
-            obj.render(self.canvas)
+            obj.render(self.canvas, WPos, WSize)
 
     # Функция рендеринга всех объектов
     def render_screen(self):
@@ -59,6 +63,12 @@ class Game():
             if not(obj in self.objects):
                 self.objects.append(obj)
 
+    # Функция добавления объекта
+    def add_gui(self, *objs: gui_node):
+        for obj in list(objs):
+            if not(obj in self.gui_objects):
+                self.gui_objects.append(obj) 
+
     def mainloop(self, _main: callable):
         while self.running:
             _delta1 = time.perf_counter() # Время начала кадра
@@ -74,7 +84,7 @@ class Game():
 
             _delta2 = time.perf_counter() # Время конца кадра
             render_delta = _delta2 - _delta1
-            #print(f"FPS: {1/render_delta}")
+            print(f"FPS: {1/render_delta}")
             self.Window.tksleep(DELTA - render_delta) # Простой в ожидании след кадра
         
         self.Window.destroy() # Выход из цикла отрисовки, завершение программы
