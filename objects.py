@@ -40,16 +40,45 @@ class Square(Node):
 
         super().render(canvas, render_pos)
 
+# Овал, имеющий размер и отрисовку
+class Oval(Node):
+    def __init__(self, pos: Pos2, size: Size2, color: str = "black", border: float = 0, border_color: str = "black", ):
+        super().__init__(pos)
+        self.size = size
+        self.color = color
+        self.border = border
+        self.border_color = border_color
+
+    def render(self, canvas: Canvas, render_pos: Pos2):
+        # Отрисовка квадрата
+        canvas.create_oval(render_pos.x - self.size.width//2, render_pos.y + self.size.height//2,
+        render_pos.x + self.size.width//2, render_pos.y - self.size.height//2,
+        fill=self.color, width=self.border, outline=self.border_color)
+
+        super().render(canvas, render_pos)
+
+def default_physics(obj):
+    # Default gravity
+    obj.vec += obj.gravity
+
 # Точка в пространстве, которая имеет физику
 class PhysicsNode(Node):
     def __init__(self, pos: Pos2, gravity: Vec2 = Vec2(0, 9.81)):
         super().__init__(pos)
         self.vec = Vec2.default()
         self.gravity = gravity
+        self.physics = default_physics
     
+    def set_physics(self, phys: callable):
+        self.physics = phys
+
     def render(self, canvas: Canvas, render_pos: Pos2):
-        # Default gravity
-        self.vec += self.gravity * DELTA
+        # call physics function
+        self.physics(self)
         self.pos += self.vec * DELTA
 
         super().render(canvas, render_pos)
+
+class Camera2D(PhysicsNode):
+    def __init__(self, pos: Pos2):
+        super().__init__(pos)

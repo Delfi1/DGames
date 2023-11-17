@@ -1,5 +1,5 @@
 import tkinter as tk
-from maths import Pos2, Size2, FPS, DELTA
+from maths import Pos2, Size2, FPS, DELTA, clump
 from objects import Node, Square
 from gui import gui_node
 
@@ -72,6 +72,7 @@ class Game():
     def add_object(self, *objs: Node):
         for obj in list(objs):
             if not(obj in self.objects):
+                print(type(obj))
                 self.objects.append(obj)
 
     # Функция добавления объекта
@@ -88,8 +89,10 @@ class Game():
         else:
             print(time.perf_counter() - self.last_f11_press)
     
-    def debug_menu(self, fps: float):
+    def debug_menu(self, current_fps: float):
         # Отрисовка меню Debug
+        fps_label = self.canvas.create_text(35, 20, text=f"FPS: {clump(current_fps, 0, FPS)}", font=("Arial", 12))
+
         window_width = self.Window.winfo_width()
         window_height = self.Window.winfo_height()
 
@@ -114,7 +117,7 @@ class Game():
 
             _delta2 = time.perf_counter() # Время конца кадра
             render_delta = _delta2 - _delta1
-            self.debug_menu(fps=(1/render_delta))
+            self.debug_menu(current_fps=(1/render_delta))
             self.Window.tksleep(DELTA - render_delta) # Простой в ожидании след кадра
         
         self.Window.destroy() # Выход из цикла отрисовки, завершение программы

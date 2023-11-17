@@ -1,3 +1,4 @@
+from math import atan
 # Константы
 FPS = 60
 DELTA = 1/60 # Время обработки одного кадра
@@ -55,8 +56,11 @@ class Vec2():
     def default(*self):
         return Vec2(0, 0)
 
-    def length(*self) -> float:
+    def length(self) -> float:
         return (self.x**2 + self.y**2) ** (1/2)
+
+    def to(self, pos: Pos2):
+        return Vec2(self.x - pos.x, self.y - pos.y)
 
     def __str__(self):
         return str((self.x, self.y))
