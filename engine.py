@@ -11,6 +11,7 @@ def tksleep(self, time:float) -> None:
     self.mainloop()
 tk.Misc.tksleep = tksleep
 
+
 class Game():
     def __init__(
         self,
@@ -41,10 +42,13 @@ class Game():
 
         # Биндинг нужных кнопок
         self.last_f11_press = 0
-        self.keybinding()
+        self.bind_key("F11", self.switch_full_screen) # Переключение режима окна
 
     def turn_off(self):
         self.running = False
+
+    def bind_key(self, key: str, func: callable):
+        self.Window.bind(f"<{key}>", lambda e: func(e))
 
     # Функция рендеринга GUI
     def render_gui(self):
@@ -76,9 +80,6 @@ class Game():
             if not(obj in self.gui_objects):
                 self.gui_objects.append(obj) 
 
-    def keybinding(self):
-        self.Window.bind("<F11>", lambda e: self.switch_full_screen(e))
-
     def switch_full_screen(self, event):
         if time.perf_counter() - self.last_f11_press > 0.5:
             self.last_f11_press = time.perf_counter()
@@ -86,7 +87,7 @@ class Game():
             self.Window.attributes('-fullscreen', self.fullscreen_mode)
         else:
             print(time.perf_counter() - self.last_f11_press)
-
+    
     def debug_menu(self, fps: float):
         # Отрисовка меню Debug
         window_width = self.Window.winfo_width()

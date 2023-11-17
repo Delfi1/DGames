@@ -4,6 +4,8 @@ from objects import Node
 import copy
 from maths import Pos2, Size2, Vec2, DELTA
 
+# Добавить FILL (заполнение всего поля по "anchor")
+
 class gui_node():
     def __init__(self, pos: Pos2, anchor_x: str = "left", anchor_y: str = "top"):
         self.pos = pos # Центр ноды
@@ -13,32 +15,36 @@ class gui_node():
         # Anchor y: top/center/bottom
         self.anchor_x = anchor_x
         self.anchor_y = anchor_y
+        self.size = Size2(0, 0)
 
     def add_child(self, *children):
         for c in list(children):
             self.children.append(c)
+    
+    def default_anchor(self, parent_pos: Pos2) -> Pos2:
+        return Pos2(self.pos.x + parent_pos.x - self.size.width//2, self.pos.y + parent_pos.y - self.size.height//2)
 
     def get_anchor_pos(self, parent_pos: Pos2, parent_size: Size2) -> Pos2:
         render_x = 0
         match self.anchor_x:
             case "left":
-                render_x = parent_pos.x + self.pos.x
+                render_x = parent_pos.x + self.pos.x + self.size.width//2
             case "right":
-                render_x = parent_pos.x + parent_size.width - self.pos.x
+                render_x = parent_pos.x + parent_size.width - self.pos.x - self.size.width//2
             case "center":
                 render_x = parent_pos.x + parent_size.width//2 + self.pos.x
             case _:
-                render_x = parent_pos.x + self.pos.x
+                render_x = parent_pos.x + self.pos.x + self.size.width//2
         render_y = 0
         match self.anchor_y:
             case "top":
-                render_y = parent_pos.y + self.pos.y
+                render_y = parent_pos.y + self.pos.y + self.size.height//2
             case "bottom":
-                render_y = parent_pos.y + parent_size.height - self.pos.y
+                render_y = parent_pos.y + parent_size.height - self.pos.y - self.size.height//2
             case "center":
                 render_y = parent_pos.y + parent_size.height//2 + self.pos.y
             case _:
-                render_y = parent_pos.y + self.pos.y
+                render_y = parent_pos.y + self.pos.y + self.size.height//2
         return Pos2(render_x, render_y)
 
     def render(self, canvas: Canvas, parent_pos: Pos2, parent_size: Size2):
@@ -47,7 +53,7 @@ class gui_node():
         #canvas.create_oval(render_pos.x - 5, render_pos.y - 5, render_pos.x + 5, render_pos.y + 5)
         # Отрисовка children относительно parent
         for c in self.children:
-            c.render(canvas, self.get_anchor_pos(parent_pos, parent_size))
+            c.render(canvas, self.default_anchor(parent_pos), self.size)
         
     def clone(self):
         return copy.deepcopy(self)
@@ -65,29 +71,6 @@ class Rect(gui_node):
         self.border = border
         self.border_color = border_color
 
-    def get_anchor_pos(self, parent_pos: Pos2, parent_size: Size2) -> Pos2:
-        render_x = 0
-        match self.anchor_x:
-            case "left":
-                render_x = parent_pos.x + self.pos.x + self.size.width//2
-            case "right":
-                render_x = parent_pos.x + parent_size.width - self.pos.x - self.size.width//2
-            case "center":
-                render_x = parent_pos.x + parent_size.width//2 + self.pos.x
-            case _:
-                render_x = parent_pos.x + self.pos.x + + self.size.width//2
-        render_y = 0
-        match self.anchor_y:
-            case "top":
-                render_y = parent_pos.y + self.pos.y + self.size.height//2
-            case "bottom":
-                render_y = parent_pos.y + parent_size.height - self.pos.y - self.size.height//2
-            case "center":
-                render_y = parent_pos.y + parent_size.height//2 + self.pos.y
-            case _:
-                render_y = parent_pos.y + self.pos.y + self.size.height//2
-        return Pos2(render_x, render_y)
-
     def render(self, canvas, parent_pos, parent_size):
         render_pos = self.get_anchor_pos(parent_pos, parent_size)
 
@@ -95,19 +78,19 @@ class Rect(gui_node):
         render_pos.x + self.size.width//2, render_pos.y - self.size.height//2,
         fill=self.color, width=self.border, outline=self.border_color)
         
-        super().render(canvas, parent_pos, parent_size)
+        super().render(canvas, render_pos, parent_size)
 
 class Button(Rect):
     pass
 
 class Label(gui_node):
-    def __init__(self, pos: Pos2, text: str):
+    def __init__(self, pos: Pos2, text: str, color: str = "white"):
         super().__init__(pos)
         self.text = text
+        self.color = color
     
-    def render(self, canvas, parent_pos, parent_size):
+    def render(self, canvas: Canvas, parent_pos, parent_size):
         render_pos = self.get_anchor_pos(parent_pos, parent_size)
-
-        label = tkinter.Label(canvas, text=self.text)
-        label.place(render_pos)
-        super().render(canvas, parent_pos, parent_size)
+        #canvas.create_oval(render_pos.x - 5, render_pos.y - 5, render_pos.x + 5, render_pos.y + 5, fill="white")
+        canvas.create_text(render_pos.x, render_pos.y, text = self.text, fill=self.color)
+        super().render(canvas, render_poss, parent_size)

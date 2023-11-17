@@ -14,10 +14,11 @@ PhysNode.add_child(square1)
 
 game.add_object(PhysNode)
 
-gui1 = Rect(Pos2(5, 5), size=Size2(100, 100), color="black")
+gui1 = Rect(Pos2(0, 0), Size2(650, 450), anchor_x="center", anchor_y="center")
+gui2 = Rect(Pos2(0, 0), Size2(50, 50), color="white", anchor_y="center")
 
-#testLabel = Label(pos=Pos2(0, 5), text="Test")
-#gui1.add_child(testLabel)
+gui1.add_child(gui2)
+
 game.add_gui(gui1)
 
 # Основная функция игры, выполняется каждый кадр
