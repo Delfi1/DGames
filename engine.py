@@ -58,6 +58,9 @@ class Game():
         for obj in self.gui_objects:
             obj.render(self.canvas, WPos, WSize)
 
+    def sort_key(self, obj):
+        return obj.level
+
     # Функция рендеринга всех объектов
     def render_screen(self):
         for obj in self.objects:
@@ -67,6 +70,7 @@ class Game():
             render_pos = obj.pos + screen_center + self.camera_pos
 
             obj.render(self.canvas, render_pos)
+            self.objects.sort(key=self.sort_key)
 
     # Функция добавления объекта
     def add_object(self, *objs: Node):
@@ -117,7 +121,7 @@ class Game():
 
             _delta2 = time.perf_counter() # Время конца кадра
             render_delta = _delta2 - _delta1
-            self.debug_menu(current_fps=(1/render_delta))
+            self.debug_menu(current_fps=(int(1/render_delta)))
             self.Window.tksleep(DELTA - render_delta) # Простой в ожидании след кадра
         
         self.Window.destroy() # Выход из цикла отрисовки, завершение программы

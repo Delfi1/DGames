@@ -7,16 +7,26 @@ import random
 
 game = Game("Test", "700x500", False)
 
-PhysNode = PhysicsNode(Pos2(-100, -100))
+Phys = PhysicsNode(Pos2(0, 0))
 
 oval1 = Oval(Pos2(0, 0), Size2(50, 50), "white", 1)
 
-PhysNode.add_child(oval1)
+Phys.add_child(oval1)
 
-game.add_object(PhysNode)
+summon = True
+counter = 0
 
 # Основная функция игры, выполняется каждый кадр
 def main(_game: Game):
-    pass
+    global summon, counter
+
+    if summon:
+        new = Phys.clone()
+        new.pos = Pos2(random.randint(-250, 250), 0)
+        new.level = random.randint(0, 10)
+        game.add_object(new)
+        counter += 1
+    if counter == 100:
+        summon = False
 
 game.mainloop(main)

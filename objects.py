@@ -7,6 +7,7 @@ class Node():
     def __init__(self, pos: Pos2):
         self.pos = pos # Центр ноды
         self.children = list()
+        self.level = 0
 
     def add_child(self, *children):
         for c in list(children):
