@@ -21,7 +21,7 @@ class Node():
     def clone(self):
         return copy.deepcopy(self)
 
-    def __type__(self):
+    def _type(self):
         return self.__class__.__name__
 
 # Квадрат, имеющий размер и отрисовку
@@ -62,6 +62,9 @@ def default_physics(obj):
     # Default gravity
     obj.vec += obj.gravity
 
+def none_physics(obj):
+    pass
+
 # Точка в пространстве, которая имеет физику
 class PhysicsNode(Node):
     def __init__(self, pos: Pos2, gravity: Vec2 = Vec2(0, 9.81)):
@@ -83,3 +86,7 @@ class PhysicsNode(Node):
 class Camera2D(PhysicsNode):
     def __init__(self, pos: Pos2):
         super().__init__(pos)
+        self.physics = none_physics
+    
+    def default(*self):
+        return Camera2D(Pos2.default())

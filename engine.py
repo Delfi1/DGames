@@ -1,6 +1,6 @@
 import tkinter as tk
 from maths import Pos2, Size2, FPS, DELTA, clump
-from objects import Node, Square
+from objects import Node, Square, Camera2D
 from gui import gui_node
 
 import time
@@ -35,7 +35,7 @@ class Game():
         # Создание необходимых массивов
         self.objects = list()
         self.gui_objects = list()
-        self.camera_pos = Pos2(0, 0)
+        self.camera = Camera2D.default()
         
         # Создание доп параметров
         self.fullscreen_mode = False
@@ -67,31 +67,41 @@ class Game():
             # obj.pos + screen_center() + camera.pos
             screen_center = Pos2(self.Window.winfo_width()//2, self.Window.winfo_height()//2)
 
-            render_pos = obj.pos + screen_center + self.camera_pos
+            render_pos = obj.pos + screen_center + self.camera.pos
 
             obj.render(self.canvas, render_pos)
             self.objects.sort(key=self.sort_key)
+
+    def find_camera(objects: list):
+        for obj in objects:
+            if obj.__type__() == "Camera2D":
+                return obj
+            else:
+                return find_camera(obj.children)
+        return None
 
     # Функция добавления объекта
     def add_object(self, *objs: Node):
         for obj in list(objs):
             if not(obj in self.objects):
-                print(type(obj))
+                if obj._type() == "Camera2D":
+                    self.camera = obj
+                if self.find_camera(obj.children) != None:
+                    self.camera = self.find_camera(obj.children)
+                
                 self.objects.append(obj)
-
+            
     # Функция добавления объекта
     def add_gui(self, *objs: gui_node):
         for obj in list(objs):
             if not(obj in self.gui_objects):
-                self.gui_objects.append(obj) 
+                self.gui_objects.append(obj)
 
     def switch_full_screen(self, event):
         if time.perf_counter() - self.last_f11_press > 0.5:
             self.last_f11_press = time.perf_counter()
             self.fullscreen_mode = not(self.fullscreen_mode)
             self.Window.attributes('-fullscreen', self.fullscreen_mode)
-        else:
-            print(time.perf_counter() - self.last_f11_press)
     
     def debug_menu(self, current_fps: float):
         # Отрисовка меню Debug
