@@ -22,7 +22,7 @@ class gui():
     def default_anchor(self, render_transform: Transform) -> Transform:
         left_pos = Pos2(render_transform.position.x - self.transform.size.width//2,
         render_transform.position.y - self.transform.size.height//2)
-        print(left_pos)
+
         return Transform(left_pos, self.transform.size)
 
     def get_anchor_pos(self, parent_transform: Transform) -> Transform:
@@ -52,7 +52,6 @@ class gui():
         render_transform = self.get_anchor_pos(parent_transform)
         
         #canvas.create_oval(render_transform.position.x - 5, render_transform.position.y - 5, render_transform.position.x + 5, render_transform.position.y + 5)
-        
         # Отрисовка children относительно parent
         for c in self.children:
             c.draw(canvas, self.default_anchor(render_transform))

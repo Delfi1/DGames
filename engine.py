@@ -90,7 +90,8 @@ class Game():
     
     def debug_menu(self, current_fps: float):
         # Отрисовка меню Debug
-        fps_label = self.canvas.create_text(35, 20, text=f"FPS: {clump(current_fps, 0, FPS)}", font=("Arial", 12))
+        cam_pos_label = self.canvas.create_text(100, 20, text=f"Pos: {self.camera.transform.position}", font=("Arial", 12), anchor="se")
+        fps_label = self.canvas.create_text(100, 40, text=f"FPS: {clump(current_fps, 0, FPS)}", font=("Arial", 12), anchor="se")
 
         window_width = self.Window.winfo_width()
         window_height = self.Window.winfo_height()

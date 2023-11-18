@@ -91,11 +91,14 @@ class PhysicsNode(Node):
 
         super().render(canvas, render_transform)
 
+# При касании с другой Area2d
 class Area2D(Node):
     def __init__(self, pos: Pos2, size: Size2, signal: callable):
         super().__init__(pos)
         self.transform.size = size
         self.signal = signal
+    
+
 
 class Camera2D(Node):
     def __init__(self, pos: Pos2):
