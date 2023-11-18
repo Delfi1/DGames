@@ -1,29 +1,37 @@
 from engine import Game
-from objects import PhysicsNode, Square, Oval, Camera2D
-from gui import gui_node, Rect, Label
-from maths import Pos2, Vec2, Size2
-from math import atan, sin, cos
+from objects import *
+from gui import *
+from maths import *
 import random
 
 game = Game("Test", "700x500", False)
-game.switch_full_screen(0)
 
-Phys = PhysicsNode(Pos2(0, 0))
+Obj1 = PhysicsNode(Pos2(0, 0))
 
-oval1 = Oval(Pos2(0, 0), Size2(50, 50), "white", 1)
+ov1 = Oval(Pos2(0, 0), Size2(50, 50))
 
-Phys.add_child(oval1)
+def script_1(obj):
+    if obj.transform.position.y >= game.Window.winfo_height()//2 - obj.transform.size.height:
+        obj.vec = Vec2(-obj.vec.x, -obj.vec.y)
 
-camera = Camera2D(Pos2(0, 0))
+Obj1.set_script(script_1)
 
-game.add_object(camera)
+Obj1.add_child(ov1)
 
-for c in range(50):
-    new = Phys.clone()
+colors = {
+    "0": "red",
+    "1": "green",
+    "2": "blue"
+}
 
-    new.pos = Pos2(random.randint(-325, 325), random.randint(-225, 225))
+for c in range(3):
+    for k in range(-325, 375, 50):
+        new = Obj1.clone()
+        new.transform.position = Pos2(k, c*50)
+        new.children[0].color = colors[str(c)]
+        game.add_object(new)
 
-    game.add_object(new)
+#game.add_object(Obj1)
 
 # Основная функция игры, выполняется каждый кадр
 def main(_game: Game):

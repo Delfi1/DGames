@@ -1,9 +1,10 @@
 import tkinter as tk
-from maths import Pos2, Size2, FPS, DELTA, clump
-from objects import Node, Square, Camera2D
-from gui import gui_node
+from maths import Pos2, Size2, Rot2, FPS, Transform, DELTA, clump
+from objects import Node, Camera2D
+from gui import gui
 
 import time
+from multiprocessing import Process
 
 # Создание функции sleep() для окна
 def tksleep(self, time:float) -> None:
@@ -50,16 +51,14 @@ class Game():
     def bind_key(self, key: str, func: callable):
         self.Window.bind(f"<{key}>", lambda e: func(e))
 
-    # Функция рендеринга GUI
-    def render_gui(self):
-        WPos = Pos2(0, 0) # Верхний левый угол
-        WSize = Size2(self.Window.winfo_width(), self.Window.winfo_height()) # Размеры окна
+    def sort_key(self, obj):
+        return obj.layer
+
+    def draw_gui(self):
+        WTransorm = Transform(Pos2(0, 0), Size2(self.Window.winfo_width(), self.Window.winfo_height())) # Верхний левый угол
 
         for obj in self.gui_objects:
-            obj.render(self.canvas, WPos, WSize)
-
-    def sort_key(self, obj):
-        return obj.level
+            obj.draw(self.canvas, WTransorm)
 
     # Функция рендеринга всех объектов
     def render_screen(self):
@@ -67,32 +66,18 @@ class Game():
             # obj.pos + screen_center() + camera.pos
             screen_center = Pos2(self.Window.winfo_width()//2, self.Window.winfo_height()//2)
 
-            render_pos = obj.pos + screen_center + self.camera.pos
+            render_transform = obj.transform + Transform(screen_center) + self.camera.transform
 
-            obj.render(self.canvas, render_pos)
-            self.objects.sort(key=self.sort_key)
-
-    def find_camera(objects: list):
-        for obj in objects:
-            if obj.__type__() == "Camera2D":
-                return obj
-            else:
-                return find_camera(obj.children)
-        return None
+            obj.render(self.canvas, render_transform)
 
     # Функция добавления объекта
     def add_object(self, *objs: Node):
         for obj in list(objs):
             if not(obj in self.objects):
-                if obj._type() == "Camera2D":
-                    self.camera = obj
-                if self.find_camera(obj.children) != None:
-                    self.camera = self.find_camera(obj.children)
-                
                 self.objects.append(obj)
-            
+
     # Функция добавления объекта
-    def add_gui(self, *objs: gui_node):
+    def add_gui(self, *objs: gui):
         for obj in list(objs):
             if not(obj in self.gui_objects):
                 self.gui_objects.append(obj)
@@ -122,12 +107,15 @@ class Game():
             self.Window.update() # Обновление окна
             _main(self) # Выполнение основной функции
 
+            # Сортировка всех объектов по layer (каждый кадр)
+            self.objects.sort(key=self.sort_key)
+
             # Очистка холоста
             self.canvas.delete('all')
 
             # Отрисовка всего окна
-            self.render_screen()
-            self.render_gui()
+            Process(target=self.render_screen).run()
+            self.draw_gui()
 
             _delta2 = time.perf_counter() # Время конца кадра
             render_delta = _delta2 - _delta1
