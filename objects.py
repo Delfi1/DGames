@@ -1,45 +1,43 @@
 from tkinter import Canvas
 import copy
-from maths import Pos2, Rot2, Size2, Vec2, Transform, DELTA
+from maths import *
 
-def default_script(obj):
-    pass
+class AddSceneAsChild(Exception):
+    def __init__(self, message, errors):
+        super().__init__(message)
 
 class Node():
-    def __init__(self, pos: Pos2, script: callable = default_script):
-        self.transform = Transform(pos)
+    def __init__(self, position: Pos2):
+        self.transform = Transform(position)
         self.children = list()
-        self.script = script
-        self.layer = 0 # Дефолт Layer 
 
     def add_child(self, *children):
-        for c in list(children):
-            self.children.append(c)
-
-    def set_script(self, new_script):
-        self.script = new_script
+        for obj in list(children):
+            if not(obj in self.children):
+                if obj._type() == "Scene":
+                    raise AddSceneAsChild
+                self.children.append(obj)
 
     def render(self, canvas: Canvas, render_transform: Transform):
-        self.script(self)
-
         for c in self.children:
-            c.render(canvas, c.transform + render_transform)
+            children_transform = render_transform + c.transform
+            c.render(canvas, children_transform)
 
     def clone(self):
         return copy.deepcopy(self)
-
+    
     def _type(self):
         return self.__class__.__name__
 
-# Квадрат, имеющий размер и отрисовку
+
 class Square(Node):
-    def __init__(self, pos: Pos2, size: Size2, color: str = "black", border: float = 0, border_color: str = "black", ):
-        super().__init__(pos)
+    def __init__(self, position: Pos2, size: Size2, color: str = "black", border: float = 0, border_color: str = "black", ):
+        super().__init__(position)
         self.transform.size = size
         self.color = color
         self.border = border
         self.border_color = border_color
-
+    
     def render(self, canvas: Canvas, render_transform: Transform):
         # Отрисовка 
         canvas.create_rectangle(render_transform.position.x - self.transform.size.width//2, render_transform.position.y + self.transform.size.height//2,
@@ -91,18 +89,27 @@ class PhysicsNode(Node):
 
         super().render(canvas, render_transform)
 
-# При касании с другой Area2d
-class Area2D(Node):
-    def __init__(self, pos: Pos2, size: Size2, signal: callable):
-        super().__init__(pos)
-        self.transform.size = size
-        self.signal = signal
-    
-
-
 class Camera2D(Node):
-    def __init__(self, pos: Pos2):
-        super().__init__(pos)
+    def __init__(self, position):
+        self.transform = Transform(position)
 
     def default(*self):
         return Camera2D(Pos2.default())
+
+
+class Scene(Node):
+    def __init__(self):
+        self.objects = list()
+        self.gui = list()
+
+        self.current_camera = Camera2D.default()
+    
+    def add_object(self, *objects):
+        for obj in list(objects):
+            self.objects.append(obj)
+
+    def render(self, canvas: Canvas):
+        for obj in self.objects:
+            screen_center = Pos2(canvas.winfo_width()//2, canvas.winfo_height()//2)
+            render_transform = obj.transform + Transform(screen_center) + self.current_camera.transform
+            obj.render(canvas, render_transform)

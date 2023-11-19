@@ -1,7 +1,7 @@
-from math import atan
+
 # Константы
-FPS = 120
-DELTA = 1/60 # Время обработки одного кадра
+FPS = 60
+DELTA = 1/FPS # Время обработки одного кадра
 
 def clump(value, _min, _max):
     return max(_min, min(_max, value))
@@ -78,8 +78,8 @@ class Rot2():
     def __init__(self, angle: float):
         self.angle = 0
 
-    def __add__(self, value: float):
-        return Rot2(self.angle + value)
+    def __add__(self, other):
+        return Rot2(self.angle + other.angle)
 
     def __str__(self):
         return str(self.angle)
@@ -88,16 +88,16 @@ class Rot2():
         return Rot2(0)
 
 class Transform():
-    def __init__(self, pos: Pos2, size: Size2 = Size2.default(), rotation: Rot2 = Rot2.default()):
-        self.position = pos
+    def __init__(self, position: Pos2, size: Size2 = Size2.default(), rotation: Rot2 = Rot2.default()):
+        self.position = position
         self.size = size
         self.rotation = rotation
     
-    def rotate(angle: float):
-        self.rotation += angle
-    
+    def default(*self):
+        return Transform(Pos2.default(), Size2.default(), Rot2.default())
+
     def __str__(self):
         return str((self.position.x, self.position.y, self.size.width, self.size.height, self.rotation.angle))
     
     def __add__(self, other):
-        return Transform(self.position + other.position, Size2.default(), self.rotation + other.rotation.angle)
+        return Transform(self.position + other.position, Size2.default(), self.rotation + other.rotation)
